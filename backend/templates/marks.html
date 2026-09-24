@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="panel">
+  <h2>唛头样式</h2>
+  <p>当前样式：前缀汉字段 + 中划线 + 四位数字，例如
+     <strong>{{ style.prefix }}-1234</strong>。</p>
+  <p>样式由 {{ style.updated_by }} 于 {{ style.updated_at.strftime('%Y-%m-%d %H:%M') }} 设定，
+     改动只约束此后提交，已入流水的唛头不变。</p>
+  {% if can_write %}
+  <form method="post" action="{{ url_for('marks') }}">
+    <input name="prefix" value="{{ style.prefix }}" placeholder="汉字前缀" required />
+    <button>更新样式</button>
+  </form>
+  {% else %}
+  <p class="fail">只读账号可查看样式与流水，不可修改样式。</p>
+  {% endif %}
+  {% if error %}<p class="fail">{{ error }}</p>{% endif %}
+  {% if notice %}<p class="pass">{{ notice }}</p>{% endif %}
+</section>
+
+<section class="panel">
+  <h2>唛头流水</h2>
+  <table>
+    <thead><tr><th>#</th><th>唛头</th><th>提交人</th><th>时间</th></tr></thead>
+    <tbody>
+      {% for entry in ledger %}
+      <tr>
+        <td>{{ entry.id }}</td>
+        <td>{{ entry.mark }}</td>
+        <td>{{ entry.created_by }}</td>
+        <td>{{ entry.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4">暂无记录</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
