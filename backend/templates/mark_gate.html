@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block body %}
+<section>
+  <h2>唛头门禁</h2>
+  <p>
+    当前样式：<strong>{{ style.prefix if style else '茶' }}-四位数字</strong>
+    （示例：{{ style.prefix if style else '茶' }}-1234，半角中划线）
+  </p>
+  {% if style %}
+  <p>最近由 {{ style.updated_by }} 于 {{ style.updated_at.strftime('%Y-%m-%d %H:%M') }} 设定。</p>
+  {% endif %}
+  {% if error %}<p class="fail">{{ error }}</p>{% endif %}
+  {% if can_write %}
+  <form method="post" action="{{ url_for('update_mark_style') }}">
+    <h3>修改样式前缀</h3>
+    <p>只约束修改之后的新提交，流水里的历史记录不变。前缀须为非空汉字段。</p>
+    <input name="prefix" value="{{ style.prefix if style else '茶' }}" required />
+    <button>保存样式</button>
+  </form>
+  {% else %}
+  <p>只读账号可查看样式与流水，修改样式与交评仅审评员可操作。</p>
+  {% endif %}
+</section>
+<section>
+  <h3>唛头流水</h3>
+  <table>
+    <thead><tr><th>唛头</th><th>提交时样式前缀</th><th>提交人</th><th>时间</th></tr></thead>
+    <tbody>
+      {% for log in logs %}
+      <tr>
+        <td>{{ log.mark }}</td>
+        <td>{{ log.prefix }}</td>
+        <td>{{ log.created_by }}</td>
+        <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4">暂无流水</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
